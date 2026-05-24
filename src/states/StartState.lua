@@ -2,7 +2,10 @@ StartState = Class{__includes = BaseState}
 
 function StartState:init()
     self.background = love.graphics.newImage('graphics/ch_01.png')
-    self.title = 'HTLTW'
+    self.story = Story('narrative/part_01.json')
+    self.currentStitchId = 'aTeacherYesThats'
+    self.text = self.story:getStitchText(self.currentStitchId)
+    self.options = self.story:getOptions(self.currentStitchId)
 end
 
 function StartState:render()
@@ -20,10 +23,23 @@ function StartState:render()
 
     love.graphics.setColor(0.92, 0.9, 0.84, 1)
     love.graphics.printf(
-        self.title,
+        self.text,
         TEXT_PANEL_X + PANEL_PADDING,
         PANEL_PADDING,
         TEXT_PANEL_WIDTH - PANEL_PADDING * 2,
         'left'
     )
+
+    local optionsY = TEXT_PANEL_HEIGHT - PANEL_PADDING - (#self.options * 34)
+
+    love.graphics.setColor(0.64, 0.6, 0.5, 1)
+    for index, option in ipairs(self.options) do
+        love.graphics.printf(
+            index .. '. ' .. option.text,
+            TEXT_PANEL_X + PANEL_PADDING,
+            optionsY + (index - 1) * 34,
+            TEXT_PANEL_WIDTH - PANEL_PADDING * 2,
+            'left'
+        )
+    end
 end
