@@ -27,3 +27,7 @@ function love.draw()
     gStateMachine:render()
     push:finish()
 end
+
+function love.mousepressed(x, y, button)
+    gStateMachine:mousepressed(x, y, button)
+end

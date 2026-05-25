@@ -3,7 +3,13 @@ StartState = Class{__includes = BaseState}
 function StartState:init()
     self.background = love.graphics.newImage('graphics/ch_01.png')
     self.story = Story('narrative/part_01.json')
-    self.currentStitchId = 'aTeacherYesThats'
+    self.optionBounds = {}
+
+    self:setStitch('aTeacherYesThats')
+end
+
+function StartState:setStitch(stitchId)
+    self.currentStitchId = stitchId
     self.text = self.story:getStitchText(self.currentStitchId)
     self.options = self.story:getOptions(self.currentStitchId)
 end
@@ -30,16 +36,49 @@ function StartState:render()
         'left'
     )
 
-    local optionsY = TEXT_PANEL_HEIGHT - PANEL_PADDING - (#self.options * 34)
+    local optionHeight = 34
+    local optionsY = TEXT_PANEL_HEIGHT - PANEL_PADDING - (#self.options * optionHeight)
+    self.optionBounds = {}
 
     love.graphics.setColor(0.64, 0.6, 0.5, 1)
     for index, option in ipairs(self.options) do
+        local optionX = TEXT_PANEL_X + PANEL_PADDING
+        local optionY = optionsY + (index - 1) * optionHeight
+        local optionWidth = TEXT_PANEL_WIDTH - PANEL_PADDING * 2
+
+        self.optionBounds[index] = {
+            x = optionX,
+            y = optionY,
+            width = optionWidth,
+            height = optionHeight
+        }
+
         love.graphics.printf(
             index .. '. ' .. option.text,
-            TEXT_PANEL_X + PANEL_PADDING,
-            optionsY + (index - 1) * 34,
-            TEXT_PANEL_WIDTH - PANEL_PADDING * 2,
+            optionX,
+            optionY,
+            optionWidth,
             'left'
         )
     end
+end
+
+function StartState:mousepressed(x, y, button)
+    if button ~= 1 then
+        return
+    end
+
+    for index, bounds in ipairs(self.optionBounds) do
+        local option = self.options[index]
+
+        if option and self:isInsideBounds(x, y, bounds) then
+            self:setStitch(option.linkPath)
+            return
+        end
+    end
+end
+
+function StartState:isInsideBounds(x, y, bounds)
+    return x >= bounds.x and x <= bounds.x + bounds.width
+        and y >= bounds.y and y <= bounds.y + bounds.height
 end

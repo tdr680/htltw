@@ -26,3 +26,7 @@ end
 function StateMachine:render()
     self.current:render()
 end
+
+function StateMachine:mousepressed(x, y, button)
+    self.current:mousepressed(x, y, button)
+end

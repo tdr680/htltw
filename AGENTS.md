@@ -48,6 +48,8 @@ AGENTS.md            Architecture, decisions, and future direction.
 
 `src/narrative/Story.lua` loads inklewriter JSON through `lunajson` and exposes stitch text and options to states. Narrative data should be accessed through this module instead of being parsed directly inside state files.
 
+`StartState` currently owns the first narrative interaction. It should track the active stitch, render that stitch's text and options, and handle mouse interaction with those options. A larger scene controller should only be introduced once this logic grows beyond the first scene.
+
 ## Screen Regions
 
 The game uses two fixed layout regions:
@@ -85,6 +87,8 @@ Each stitch `content` array may contain plain text strings and metadata tables. 
 3. Return the text fragments for a stitch.
 4. Return available options for a stitch.
 
+Option interaction should use the option table's `linkPath` to choose the next stitch. The state should then refresh both text and options from `Story`.
+
 ## Libraries And Patterns
 
 Use these libraries when implementing game systems:
@@ -117,6 +121,7 @@ require 'lib/lunajson/sax'
 - Use `push.lua` and `lib/knife` utilities for future functionality whenever they simplify the code.
 - `narrative/part_01.json` contains part of the inklewriter story.
 - The start scene should output the first stitch, `aTeacherYesThats`, in the right panel.
+- Right-panel options should be interactive with the mouse. On mouse press, clicking an option should change the right-panel text to that option's target stitch.
 - Future architectural and technical decisions should be recorded in this file.
 
 ## Current Project State
@@ -132,21 +137,22 @@ The project has been brought to a minimal runnable Love2D scaffold:
 7. `main.lua` uses `push.lua` for drawing.
 8. `lib/lunajson.lua` is available for JSON parsing.
 9. `src/narrative/Story.lua` loads inklewriter JSON and exposes stitch text and options.
-10. `StartState` renders stitch `aTeacherYesThats` from `narrative/part_01.json` and displays its options as non-interactive text.
+10. `StartState` renders stitch `aTeacherYesThats` from `narrative/part_01.json` and displays its options.
 11. Lua syntax has been checked with `luac -p`.
 12. `lunajson` has been smoke-tested against `narrative/part_01.json`.
+13. `main.lua` delegates mouse presses to the active state.
+14. `StartState` stores clickable option bounds and switches to the clicked option's `linkPath` stitch.
 
 ## Suggested Next Implementation
 
-The next code change should make the displayed options selectable.
+The next code change should improve option presentation and interaction feedback.
 
 Suggested steps:
 
-1. Add keyboard input for choosing an option.
-2. Change `StartState.currentStitchId` to the selected option's `linkPath`.
-3. Refresh the displayed stitch text and options after selection.
-4. Add a visual selected-option state if keyboard navigation is used.
-5. Keep the narrative transition logic inside `StartState` or move it into a later scene controller only when it grows.
+1. Add hover styling for options in the right panel.
+2. Add spacing that adapts to longer option text.
+3. Add a graceful end-state display for stitches without options.
+4. Consider moving text layout constants into `src/constants.lua` if the panel UI grows.
 
 ## Workflow
 
