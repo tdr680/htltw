@@ -1,24 +1,24 @@
-StartState = Class{__includes = BaseState}
+PlayState = Class{__includes = BaseState}
 
-function StartState:init()
-    self.background = love.graphics.newImage('graphics/ch_01.png')
+function PlayState:init()
     self.story = Story('narrative/part_01.json')
+    self.scene = Scene()
     self.optionBounds = {}
 
     self:setStitch('aTeacherYesThats')
 end
 
-function StartState:setStitch(stitchId)
+function PlayState:setStitch(stitchId)
     self.currentStitchId = stitchId
     self.text = self.story:getStitchText(self.currentStitchId)
     self.options = self.story:getOptions(self.currentStitchId)
+    self.scene:setStitch(self.currentStitchId)
 end
 
-function StartState:render()
+function PlayState:render()
     love.graphics.clear(0.04, 0.04, 0.045, 1)
 
-    love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.draw(self.background, 0, 0)
+    self.scene:render()
 
     love.graphics.setColor(0.08, 0.08, 0.09, 1)
     love.graphics.rectangle('fill', TEXT_PANEL_X, 0, TEXT_PANEL_WIDTH, TEXT_PANEL_HEIGHT)
@@ -63,7 +63,7 @@ function StartState:render()
     end
 end
 
-function StartState:mousepressed(x, y, button)
+function PlayState:mousepressed(x, y, button)
     if button ~= 1 then
         return
     end
@@ -78,7 +78,7 @@ function StartState:mousepressed(x, y, button)
     end
 end
 
-function StartState:isInsideBounds(x, y, bounds)
+function PlayState:isInsideBounds(x, y, bounds)
     return x >= bounds.x and x <= bounds.x + bounds.width
         and y >= bounds.y and y <= bounds.y + bounds.height
 end

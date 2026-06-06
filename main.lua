@@ -12,10 +12,10 @@ function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
     gStateMachine = StateMachine {
-        ['start'] = function() return StartState() end
+        ['play'] = function() return PlayState() end
     }
 
-    gStateMachine:change('start')
+    gStateMachine:change('play')
 end
 
 function love.update(dt)

@@ -20,7 +20,7 @@ Code structure and implementation patterns should take inspiration from these CS
 - Game source code lives in `src/`.
 - State classes live in `src/states/`.
 - Narrative loading code lives in `src/narrative/`.
-- Future game object and scene support should live under `src/world/` or another clearly named `src/` subfolder.
+- Scene and world presentation code lives in `src/world/`.
 
 ## Project Layout
 
@@ -32,7 +32,7 @@ lib/                 Third-party helpers: class, push, lunajson, and knife utili
 src/                 Game source files.
 src/states/          State machine states.
 src/narrative/       Story loading and inklewriter JSON helpers.
-src/world/           Scene, character, and object code when needed.
+src/world/           Scene, character, and object code.
 AGENTS.md            Architecture, decisions, and future direction.
 ```
 
@@ -48,7 +48,9 @@ AGENTS.md            Architecture, decisions, and future direction.
 
 `src/narrative/Story.lua` loads inklewriter JSON through `lunajson` and exposes stitch text and options to states. Narrative data should be accessed through this module instead of being parsed directly inside state files.
 
-`StartState` currently owns the first narrative interaction. It should track the active stitch, render that stitch's text and options, and handle mouse interaction with those options. A larger scene controller should only be introduced once this logic grows beyond the first scene.
+`src/world/Scene.lua` owns left-stage rendering. It receives the active stitch id, looks for a matching image, and renders a blank stage when no matching image exists.
+
+`PlayState` owns the first narrative interaction. It tracks the active stitch, delegates left-stage rendering to `Scene`, renders that stitch's text and options, and handles mouse interaction with those options. A larger scene controller should only be introduced once this logic grows beyond the first scene.
 
 ## Screen Regions
 
@@ -59,7 +61,7 @@ The game uses two fixed layout regions:
 960,0    320x720  Narrative text panel
 ```
 
-The first scene draws `graphics/ch_01.png` into the visual stage. The right panel renders story text from the first inklewriter stitch, `aTeacherYesThats`, in `narrative/part_01.json`.
+The first scene draws `graphics/aTeacherYesThats.png` into the visual stage. The right panel renders story text from the first inklewriter stitch, `aTeacherYesThats`, in `narrative/part_01.json`.
 
 ## Narrative Content
 
@@ -116,11 +118,14 @@ require 'lib/lunajson/sax'
 
 ## Decisions
 
-- First scene: draw `graphics/ch_01.png` on the left. The original right-panel placeholder was `HTLTW`.
+- Stitch-specific images live in `graphics/` and should be named after their stitch id, for example `graphics/aTeacherYesThats.png`.
+- If the active stitch has no matching image, the left visual stage should be blank.
+- `Scene` owns left-stage image lookup, caching, and rendering.
+- First scene: draw `graphics/aTeacherYesThats.png` on the left. The original right-panel placeholder was `HTLTW`.
 - Use `lib/class.lua` for all classes.
 - Use `push.lua` and `lib/knife` utilities for future functionality whenever they simplify the code.
 - `narrative/part_01.json` contains part of the inklewriter story.
-- The start scene should output the first stitch, `aTeacherYesThats`, in the right panel.
+- `PlayState` should output the first stitch, `aTeacherYesThats`, in the right panel.
 - Right-panel options should be interactive with the mouse. On mouse press, clicking an option should change the right-panel text to that option's target stitch.
 - Future architectural and technical decisions should be recorded in this file.
 
@@ -133,15 +138,18 @@ The project has been brought to a minimal runnable Love2D scaffold:
 3. `src/constants.lua` defines the 1280x720 window, 960x720 visual stage, and 320x720 text panel.
 4. `src/StateMachine.lua` implements a small state machine using `lib/class.lua`.
 5. `src/states/BaseState.lua` defines no-op state callbacks.
-6. `src/states/StartState.lua` renders the first scene with `graphics/ch_01.png`.
+6. `src/states/PlayState.lua` renders the first scene and delegates left-stage image rendering to `src/world/Scene.lua`.
 7. `main.lua` uses `push.lua` for drawing.
 8. `lib/lunajson.lua` is available for JSON parsing.
 9. `src/narrative/Story.lua` loads inklewriter JSON and exposes stitch text and options.
-10. `StartState` renders stitch `aTeacherYesThats` from `narrative/part_01.json` and displays its options.
+10. `PlayState` renders stitch `aTeacherYesThats` from `narrative/part_01.json` and displays its options.
 11. Lua syntax has been checked with `luac -p`.
 12. `lunajson` has been smoke-tested against `narrative/part_01.json`.
 13. `main.lua` delegates mouse presses to the active state.
-14. `StartState` stores clickable option bounds and switches to the clicked option's `linkPath` stitch.
+14. `PlayState` stores clickable option bounds and switches to the clicked option's `linkPath` stitch.
+15. `graphics/ch_01.png` was renamed to `graphics/aTeacherYesThats.png`.
+16. `graphics/ch_02.png` was renamed to `graphics/byFourOclockTheP.png`.
+17. `src/world/Scene.lua` renders `graphics/<stitchId>.png` when present and a blank left stage when missing.
 
 ## Suggested Next Implementation
 
