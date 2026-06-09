@@ -78,6 +78,12 @@ function PlayState:mousepressed(x, y, button)
     end
 end
 
+function PlayState:keypressed(key)
+    if key == 'escape' then
+        gStateStack:push(PopupState())
+    end
+end
+
 function PlayState:isInsideBounds(x, y, bounds)
     return x >= bounds.x and x <= bounds.x + bounds.width
         and y >= bounds.y and y <= bounds.y + bounds.height

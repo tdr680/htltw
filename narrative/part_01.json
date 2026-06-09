@@ -6,9 +6,6 @@
                 "content": [
                     "A teacher… Yes, that’s what I do for a living. I’ve been doing it for two years now, but it feels like a century… Thank God today’s over.",
                     {
-                        "runOn": true
-                    },
-                    {
                         "option": "Go straight to the pub",
                         "linkPath": "veryGoodAfterEnd",
                         "ifConditions": null,
@@ -23,6 +20,12 @@
                     {
                         "option": "(letter instructions)",
                         "linkPath": "chooseANumberFro",
+                        "ifConditions": null,
+                        "notIfConditions": null
+                    },
+                    {
+                        "option": "(Emile)",
+                        "linkPath": "emileIsTheOnlySt",
                         "ifConditions": null,
                         "notIfConditions": null
                     },
@@ -53,9 +56,112 @@
                     }
                 ]
             },
+            "emileIsTheOnlySt": {
+                "content": [
+                    "Emile is the only student who makes me feel it‘s not completely for nothing what I am doing. He tries to understand what I am trying to explain, his results in the exams prove that he is good and I don‘t spoil it. He was the only one who really passed the last algebra test last week. I let the most of the others pass too, but Emile deserves that.",
+                    {
+                        "option": "How can I help you?",
+                        "linkPath": "emileApprochesMe",
+                        "ifConditions": null,
+                        "notIfConditions": null
+                    }
+                ]
+            },
+            "byFourOclockTheP": {
+                "content": [
+                    "By four o’clock, the pub ‘Three Cats’ is already almost full. The low-ceilinged room is thick with cigarette smoke and the smell of burnt grease from the kitchen. Several people inside beckon me with conspiratorial, insincere smiles.",
+                    {
+                        "option": "Right to my table",
+                        "linkPath": "todayAreThereKou",
+                        "ifConditions": null,
+                        "notIfConditions": null
+                    }
+                ]
+            },
+            "maybeThereIsStil": {
+                "content": [
+                    "Maybe there is still Nadia working in the staffroom, preparing lessons for the next day.",
+                    {
+                        "option": "Why would you care?",
+                        "linkPath": "nadiaIsTheOnlyCo",
+                        "ifConditions": null,
+                        "notIfConditions": null
+                    },
+                    {
+                        "option": "Is it worth it?",
+                        "linkPath": "toTalkToNadiaWou",
+                        "ifConditions": null,
+                        "notIfConditions": null
+                    }
+                ]
+            },
+            "emileApprochesMe": {
+                "content": [
+                    "Emile approches me and greets. I can see that he wants to ask me someting different than other times when he has a question about the stuff from our lesson. He doesn‘t know how to start or even whether it was a good idea to ask me at all.",
+                    {
+                        "option": "Just wait",
+                        "linkPath": "justWaitingMyFac",
+                        "ifConditions": null,
+                        "notIfConditions": null
+                    }
+                ]
+            },
+            "todayAreThereKou": {
+                "content": [
+                    "Today are there Koulouch and Barta, empty chair is waiting for me. Barta deals the cards and bets are placed. First game goes to me, then the luck changes and I am loosing quite a lot. But it‘s worth it. Probably the only moment when I feel emotions and exitement. During the game I forget about dullness and emptiness of the days. ",
+                    {
+                        "option": "Leave",
+                        "linkPath": "okThatsEnoughFor",
+                        "ifConditions": null,
+                        "notIfConditions": null
+                    },
+                    {
+                        "option": "Stay",
+                        "linkPath": "evenThoughIFeelD",
+                        "ifConditions": null,
+                        "notIfConditions": null
+                    }
+                ]
+            },
+            "nadiaIsTheOnlyCo": {
+                "content": [
+                    "Nadia is the only college who I like to talk to. About same age like me, teaching history, quiet, calm, doesn't seek contact with others. maybe with the exception of me. (or is it just wishful thinking?)"
+                ]
+            },
+            "toTalkToNadiaWou": {
+                "content": [
+                    "To talk to Nadia would help me to feel a bit better. But maybe there are other colleges which would cause the opposite."
+                ]
+            },
+            "justWaitingMyFac": {
+                "content": [
+                    "Just waiting, my face should express that if he changes his mind and walks away, it‘s completely fine with me. Then he opens his bag and reaches me a notebook. Looks similar we use, I take it, a bit surprised why he hesitated to show me his notes. Regarding the notebook a bit closer, it looks similar to ours, but older. It smells older… But on the top page is his name: „Emile Bernard“, so why he looks so nerveous?",
+                    {
+                        "divert": "heGuessesWhatIAm"
+                    }
+                ]
+            },
+            "heGuessesWhatIAm": {
+                "content": [
+                    "He guesses what I am thinking about and say: „It‘s my grandfather Emile, not me. Would you please have a look whether it makes sens to you?“"
+                ]
+            },
+            "okThatsEnoughFor": {
+                "content": [
+                    "Ok, that‘s enough for today. I get up with the quiet sigh and say „See you tomorrow“."
+                ]
+            },
+            "evenThoughIFeelD": {
+                "content": [
+                    "Even though I feel drunk and already loosing more money than ususal, I order another beer and deal the cards."
+                ]
+            },
             "chooseANumberFro": {
                 "content": [
                     "Choose a number from one to six:",
+                    {
+                        "runOn": true
+                    },
                     {
                         "option": "one",
                         "linkPath": "nowRollTheDice",
@@ -91,17 +197,10 @@
                         "linkPath": "blankStitch",
                         "ifConditions": null,
                         "notIfConditions": null
+                    },
+                    {
+                        "pageNum": 2
                     }
-                ]
-            },
-            "byFourOclockTheP": {
-                "content": [
-                    "By four o’clock, the pub ‘Three Cats’ is already almost full. The low-ceilinged room is thick with cigarette smoke and the smell of burnt grease from the kitchen. Several people inside beckon me with conspiratorial, insincere smiles."
-                ]
-            },
-            "maybeThereIsStil": {
-                "content": [
-                    "Maybe there is still Nadia working in the staffroom, preparing lessons for the next day."
                 ]
             },
             "nowRollTheDice": {
@@ -130,7 +229,7 @@
         "optionMirroring": true,
         "allowCheckpoints": false,
         "editorData": {
-            "playPoint": "aTeacherYesThats",
+            "playPoint": "emileIsTheOnlySt",
             "libraryVisible": false,
             "authorName": "SimilarBlacksmith",
             "textSize": 0

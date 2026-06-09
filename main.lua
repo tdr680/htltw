@@ -11,23 +11,24 @@ function love.load()
 
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
-    gStateMachine = StateMachine {
-        ['play'] = function() return PlayState() end
-    }
-
-    gStateMachine:change('play')
+    gStateStack = StateStack()
+    gStateStack:push(PlayState())
 end
 
 function love.update(dt)
-    gStateMachine:update(dt)
+    gStateStack:update(dt)
 end
 
 function love.draw()
     push:start()
-    gStateMachine:render()
+    gStateStack:render()
     push:finish()
 end
 
 function love.mousepressed(x, y, button)
-    gStateMachine:mousepressed(x, y, button)
+    gStateStack:mousepressed(x, y, button)
+end
+
+function love.keypressed(key)
+    gStateStack:keypressed(key)
 end

@@ -38,11 +38,13 @@ AGENTS.md            Architecture, decisions, and future direction.
 
 ## Runtime Flow
 
-`main.lua` loads `src/Dependencies.lua`, configures the window through `push`, creates the global state machine, and delegates update and draw calls to the active state.
+`main.lua` loads `src/Dependencies.lua`, configures the window through `push`, creates the global state stack, and delegates update, draw, and input calls through the stack.
 
 `src/Dependencies.lua` is the central require file. It loads constants, framework helpers, narrative helpers, and states in one place so `main.lua` stays small.
 
-`src/StateMachine.lua` owns transitions between states. Each state may implement `enter`, `exit`, `update`, and `render`.
+`src/StateStack.lua` is the top-level state controller, following the CS50 Pokemon StateStack pattern. It updates and sends input only to the top state, but renders all states from bottom to top.
+
+`src/StateMachine.lua` remains available for future nested state machines. Each state may implement `enter`, `exit`, `update`, `render`, `mousepressed`, and `keypressed`.
 
 `src/states/BaseState.lua` provides no-op methods so individual states only implement the callbacks they need.
 
@@ -51,6 +53,8 @@ AGENTS.md            Architecture, decisions, and future direction.
 `src/world/Scene.lua` owns left-stage rendering. It receives the active stitch id, looks for a matching image, and renders a blank stage when no matching image exists.
 
 `PlayState` owns the first narrative interaction. It tracks the active stitch, delegates left-stage rendering to `Scene`, renders that stitch's text and options, and handles mouse interaction with those options. A larger scene controller should only be introduced once this logic grows beyond the first scene.
+
+`PopupState` is pushed on top of `PlayState` when Escape is pressed. While it is on top, `PlayState` remains visible underneath but receives no update or mouse input. Pressing Escape again pops the popup.
 
 ## Screen Regions
 
@@ -127,6 +131,7 @@ require 'lib/lunajson/sax'
 - `narrative/part_01.json` contains part of the inklewriter story.
 - `PlayState` should output the first stitch, `aTeacherYesThats`, in the right panel.
 - Right-panel options should be interactive with the mouse. On mouse press, clicking an option should change the right-panel text to that option's target stitch.
+- Use `StateStack` for modal overlays. Escape should push a half-width, half-height popup panel over `PlayState`; while the popup is active, underlying mouse interaction is paused.
 - Future architectural and technical decisions should be recorded in this file.
 
 ## Current Project State
@@ -137,19 +142,22 @@ The project has been brought to a minimal runnable Love2D scaffold:
 2. `src/Dependencies.lua` is the central require file.
 3. `src/constants.lua` defines the 1280x720 window, 960x720 visual stage, and 320x720 text panel.
 4. `src/StateMachine.lua` implements a small state machine using `lib/class.lua`.
-5. `src/states/BaseState.lua` defines no-op state callbacks.
-6. `src/states/PlayState.lua` renders the first scene and delegates left-stage image rendering to `src/world/Scene.lua`.
-7. `main.lua` uses `push.lua` for drawing.
-8. `lib/lunajson.lua` is available for JSON parsing.
-9. `src/narrative/Story.lua` loads inklewriter JSON and exposes stitch text and options.
-10. `PlayState` renders stitch `aTeacherYesThats` from `narrative/part_01.json` and displays its options.
-11. Lua syntax has been checked with `luac -p`.
-12. `lunajson` has been smoke-tested against `narrative/part_01.json`.
-13. `main.lua` delegates mouse presses to the active state.
-14. `PlayState` stores clickable option bounds and switches to the clicked option's `linkPath` stitch.
-15. `graphics/ch_01.png` was renamed to `graphics/aTeacherYesThats.png`.
-16. `graphics/ch_02.png` was renamed to `graphics/byFourOclockTheP.png`.
-17. `src/world/Scene.lua` renders `graphics/<stitchId>.png` when present and a blank left stage when missing.
+5. `src/StateStack.lua` controls the top-level state stack.
+6. `src/states/BaseState.lua` defines no-op state callbacks.
+7. `src/states/PlayState.lua` renders the first scene and delegates left-stage image rendering to `src/world/Scene.lua`.
+8. `src/states/PopupState.lua` renders a centered half-screen pause popup.
+9. `main.lua` uses `push.lua` for drawing.
+10. `lib/lunajson.lua` is available for JSON parsing.
+11. `src/narrative/Story.lua` loads inklewriter JSON and exposes stitch text and options.
+12. `PlayState` renders stitch `aTeacherYesThats` from `narrative/part_01.json` and displays its options.
+13. Lua syntax has been checked with `luac -p`.
+14. `lunajson` has been smoke-tested against `narrative/part_01.json`.
+15. `main.lua` delegates mouse and keyboard input to the state stack.
+16. `PlayState` stores clickable option bounds and switches to the clicked option's `linkPath` stitch.
+17. `graphics/ch_01.png` was renamed to `graphics/aTeacherYesThats.png`.
+18. `graphics/ch_02.png` was renamed to `graphics/byFourOclockTheP.png`.
+19. `src/world/Scene.lua` renders `graphics/<stitchId>.png` when present and a blank left stage when missing.
+20. Pressing Escape in `PlayState` pushes `PopupState`; pressing Escape in `PopupState` pops it.
 
 ## Suggested Next Implementation
 

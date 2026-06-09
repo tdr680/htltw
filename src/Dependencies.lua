@@ -4,9 +4,11 @@ lunajson = require 'lib/lunajson'
 
 require 'src/constants'
 require 'src/StateMachine'
+require 'src/StateStack'
 
 require 'src/narrative/Story'
 require 'src/world/Scene'
 
 require 'src/states/BaseState'
+require 'src/states/PopupState'
 require 'src/states/PlayState'
