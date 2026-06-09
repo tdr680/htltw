@@ -29,6 +29,10 @@ function love.mousepressed(x, y, button)
     gStateStack:mousepressed(x, y, button)
 end
 
+function love.mousemoved(x, y)
+    gStateStack:mousemoved(x, y)
+end
+
 function love.keypressed(key)
     gStateStack:keypressed(key)
 end

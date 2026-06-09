@@ -25,6 +25,10 @@ function Story:getStitch(stitchId)
     return stitch
 end
 
+function Story:hasStitch(stitchId)
+    return self.data.data.stitches[stitchId] ~= nil
+end
+
 function Story:getStitchText(stitchId)
     local stitch = self:getStitch(stitchId)
     local fragments = {}

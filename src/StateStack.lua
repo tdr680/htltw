@@ -40,6 +40,12 @@ function StateStack:mousepressed(x, y, button)
     end
 end
 
+function StateStack:mousemoved(x, y)
+    if #self.states > 0 then
+        self.states[#self.states]:mousemoved(x, y)
+    end
+end
+
 function StateStack:keypressed(key)
     if #self.states > 0 then
         self.states[#self.states]:keypressed(key)

@@ -5,4 +5,5 @@ function BaseState:exit() end
 function BaseState:update() end
 function BaseState:render() end
 function BaseState:mousepressed() end
+function BaseState:mousemoved() end
 function BaseState:keypressed() end

@@ -32,7 +32,7 @@ lib/                 Third-party helpers: class, push, lunajson, and knife utili
 src/                 Game source files.
 src/states/          State machine states.
 src/narrative/       Story loading and inklewriter JSON helpers.
-src/world/           Scene, character, and object code.
+src/world/           Scene, hotspot, character, and object code.
 AGENTS.md            Architecture, decisions, and future direction.
 ```
 
@@ -50,9 +50,11 @@ AGENTS.md            Architecture, decisions, and future direction.
 
 `src/narrative/Story.lua` loads inklewriter JSON through `lunajson` and exposes stitch text and options to states. Narrative data should be accessed through this module instead of being parsed directly inside state files.
 
-`src/world/Scene.lua` owns left-stage rendering. It receives the active stitch id, looks for a matching image, and renders a blank stage when no matching image exists.
+`src/world/Scene.lua` owns left-stage rendering, hotspot hover visualization, and left-stage mouse hit detection. It receives the active stitch id, looks for a matching image, renders a blank stage when no matching image exists, and delegates hotspot lookup to `Hotspots`.
 
-`PlayState` owns the first narrative interaction. It tracks the active stitch, delegates left-stage rendering to `Scene`, renders that stitch's text and options, and handles mouse interaction with those options. A larger scene controller should only be introduced once this logic grows beyond the first scene.
+`src/world/hotspot_data.lua` stores stitch-keyed hotspot data. `src/world/Hotspots.lua` defines the `Hotspots` class, which manages that data and returns the clicked hotspot for a stitch.
+
+`PlayState` owns the first narrative interaction. It tracks the active stitch, delegates left-stage rendering and left-stage hotspot detection to `Scene`, renders that stitch's text and options, and handles mouse interaction with those options. A larger scene controller should only be introduced once this logic grows beyond the first scene.
 
 `PopupState` is pushed on top of `PlayState` when Escape is pressed. While it is on top, `PlayState` remains visible underneath but receives no update or mouse input. Pressing Escape again pops the popup.
 
@@ -92,6 +94,7 @@ Each stitch `content` array may contain plain text strings and metadata tables. 
 2. Resolve the initial stitch from `data.initial`.
 3. Return the text fragments for a stitch.
 4. Return available options for a stitch.
+5. Report whether a stitch id exists before optional interactions try to navigate to it.
 
 Option interaction should use the option table's `linkPath` to choose the next stitch. The state should then refresh both text and options from `Story`.
 
@@ -125,6 +128,11 @@ require 'lib/lunajson/sax'
 - Stitch-specific images live in `graphics/` and should be named after their stitch id, for example `graphics/aTeacherYesThats.png`.
 - If the active stitch has no matching image, the left visual stage should be blank.
 - `Scene` owns left-stage image lookup, caching, and rendering.
+- Left-stage interactive areas are rectangular hotspots keyed by stitch id in `src/world/hotspot_data.lua`.
+- `Hotspots` owns hotspot lookup; `Scene` asks it which hotspot was clicked; `PlayState` decides what the hotspot action means.
+- Hotspot targets may be placeholders during development. `PlayState` should only navigate to a hotspot target when `Story` confirms the stitch exists.
+- Hovered hotspots should be visualized on the left stage during development.
+- Clicking a hotspot should emit a debug statement with the hotspot id, action, and target.
 - First scene: draw `graphics/aTeacherYesThats.png` on the left. The original right-panel placeholder was `HTLTW`.
 - Use `lib/class.lua` for all classes.
 - Use `push.lua` and `lib/knife` utilities for future functionality whenever they simplify the code.
@@ -158,6 +166,11 @@ The project has been brought to a minimal runnable Love2D scaffold:
 18. `graphics/ch_02.png` was renamed to `graphics/byFourOclockTheP.png`.
 19. `src/world/Scene.lua` renders `graphics/<stitchId>.png` when present and a blank left stage when missing.
 20. Pressing Escape in `PlayState` pushes `PopupState`; pressing Escape in `PopupState` pops it.
+21. `src/world/hotspot_data.lua` stores example rectangular hotspots for `aTeacherYesThats` and `byFourOclockTheP`.
+22. `src/world/Hotspots.lua` defines the `Hotspots` class and manages hotspot hit detection.
+23. `Scene` handles left-stage mouse clicks and returns clicked hotspots to `PlayState`.
+24. `Scene` tracks the hovered hotspot and renders a translucent rectangle over it.
+25. `PlayState` prints a debug statement when a hotspot is clicked.
 
 ## Suggested Next Implementation
 
@@ -168,7 +181,8 @@ Suggested steps:
 1. Add hover styling for options in the right panel.
 2. Add spacing that adapts to longer option text.
 3. Add a graceful end-state display for stitches without options.
-4. Consider moving text layout constants into `src/constants.lua` if the panel UI grows.
+4. Consider adding a toggle for hotspot debug rendering.
+5. Consider moving text layout constants into `src/constants.lua` if the panel UI grows.
 
 ## Workflow
 

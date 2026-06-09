@@ -68,6 +68,14 @@ function PlayState:mousepressed(x, y, button)
         return
     end
 
+    local hotspot = self.scene:mousepressed(x, y, button)
+
+    if hotspot then
+        print('Hotspot clicked: ' .. hotspot.id .. ' -> ' .. hotspot.action .. ':' .. tostring(hotspot.target))
+        self:handleHotspot(hotspot)
+        return
+    end
+
     for index, bounds in ipairs(self.optionBounds) do
         local option = self.options[index]
 
@@ -75,6 +83,16 @@ function PlayState:mousepressed(x, y, button)
             self:setStitch(option.linkPath)
             return
         end
+    end
+end
+
+function PlayState:mousemoved(x, y)
+    self.scene:mousemoved(x, y)
+end
+
+function PlayState:handleHotspot(hotspot)
+    if hotspot.action == 'stitch' and self.story:hasStitch(hotspot.target) then
+        self:setStitch(hotspot.target)
     end
 end
 
