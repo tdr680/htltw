@@ -48,13 +48,15 @@ AGENTS.md            Architecture, decisions, and future direction.
 
 `src/states/BaseState.lua` provides no-op methods so individual states only implement the callbacks they need.
 
-`src/narrative/Story.lua` loads inklewriter JSON through `lunajson` and exposes stitch text and options to states. Narrative data should be accessed through this module instead of being parsed directly inside state files.
+`src/narrative/Story.lua` loads inklewriter JSON through `lunajson` and exposes stitch text and options to narrative-facing classes. Narrative data should be accessed through this module instead of being parsed directly inside state files.
+
+`src/narrative/Script.lua` owns `Story`, the active stitch id, right-panel rendering, option navigation, and right-panel option hit detection. It exposes the active stitch id so `PlayState` can keep `Scene` synchronized.
 
 `src/world/Scene.lua` owns left-stage rendering, hotspot hover visualization, and left-stage mouse hit detection. It receives the active stitch id, looks for a matching image, renders a blank stage when no matching image exists, and delegates hotspot lookup to `Hotspots`.
 
 `src/world/hotspot_data.lua` stores stitch-keyed hotspot data. `src/world/Hotspots.lua` defines the `Hotspots` class, which manages that data and returns the clicked hotspot for a stitch.
 
-`PlayState` owns the first narrative interaction. It tracks the active stitch, delegates left-stage rendering and left-stage hotspot detection to `Scene`, renders that stitch's text and options, and handles mouse interaction with those options. A larger scene controller should only be introduced once this logic grows beyond the first scene.
+`PlayState` coordinates `Scene` and `Script`. `Script` owns story navigation and the active stitch; `PlayState` asks `Script` for the current stitch and tells `Scene` to render the matching visual stage. A larger scene controller should only be introduced once this logic grows beyond the first scene.
 
 `PopupState` is pushed on top of `PlayState` when Escape is pressed. While it is on top, `PlayState` remains visible underneath but receives no update or mouse input. Pressing Escape again pops the popup.
 
@@ -138,6 +140,7 @@ require 'lib/lunajson/sax'
 - Use `push.lua` and `lib/knife` utilities for future functionality whenever they simplify the code.
 - `narrative/part_01.json` contains part of the inklewriter story.
 - `PlayState` should output the first stitch, `aTeacherYesThats`, in the right panel.
+- `Script` owns `Story`, right-panel text rendering, option click detection, and stitch navigation.
 - Right-panel options should be interactive with the mouse. On mouse press, clicking an option should change the right-panel text to that option's target stitch.
 - Use `StateStack` for modal overlays. Escape should push a half-width, half-height popup panel over `PlayState`; while the popup is active, underlying mouse interaction is paused.
 - Future architectural and technical decisions should be recorded in this file.
@@ -157,20 +160,22 @@ The project has been brought to a minimal runnable Love2D scaffold:
 9. `main.lua` uses `push.lua` for drawing.
 10. `lib/lunajson.lua` is available for JSON parsing.
 11. `src/narrative/Story.lua` loads inklewriter JSON and exposes stitch text and options.
-12. `PlayState` renders stitch `aTeacherYesThats` from `narrative/part_01.json` and displays its options.
-13. Lua syntax has been checked with `luac -p`.
-14. `lunajson` has been smoke-tested against `narrative/part_01.json`.
-15. `main.lua` delegates mouse and keyboard input to the state stack.
-16. `PlayState` stores clickable option bounds and switches to the clicked option's `linkPath` stitch.
-17. `graphics/ch_01.png` was renamed to `graphics/aTeacherYesThats.png`.
-18. `graphics/ch_02.png` was renamed to `graphics/byFourOclockTheP.png`.
-19. `src/world/Scene.lua` renders `graphics/<stitchId>.png` when present and a blank left stage when missing.
-20. Pressing Escape in `PlayState` pushes `PopupState`; pressing Escape in `PopupState` pops it.
-21. `src/world/hotspot_data.lua` stores example rectangular hotspots for `aTeacherYesThats` and `byFourOclockTheP`.
-22. `src/world/Hotspots.lua` defines the `Hotspots` class and manages hotspot hit detection.
-23. `Scene` handles left-stage mouse clicks and returns clicked hotspots to `PlayState`.
-24. `Scene` tracks the hovered hotspot and renders a translucent rectangle over it.
-25. `PlayState` prints a debug statement when a hotspot is clicked.
+12. `src/narrative/Script.lua` owns `Story`, renders the right text panel, detects clicked options, and changes active stitches.
+13. `PlayState` renders stitch `aTeacherYesThats` from `narrative/part_01.json` by coordinating `Script` and `Scene`.
+14. Lua syntax has been checked with `luac -p`.
+15. `lunajson` has been smoke-tested against `narrative/part_01.json`.
+16. `main.lua` delegates mouse and keyboard input to the state stack.
+17. `Script` stores clickable option bounds and switches to the clicked option's `linkPath` stitch.
+18. `PlayState` syncs `Scene` whenever `Script` changes the active stitch.
+19. `graphics/ch_01.png` was renamed to `graphics/aTeacherYesThats.png`.
+20. `graphics/ch_02.png` was renamed to `graphics/byFourOclockTheP.png`.
+21. `src/world/Scene.lua` renders `graphics/<stitchId>.png` when present and a blank left stage when missing.
+22. Pressing Escape in `PlayState` pushes `PopupState`; pressing Escape in `PopupState` pops it.
+23. `src/world/hotspot_data.lua` stores example rectangular hotspots for `aTeacherYesThats` and `byFourOclockTheP`.
+24. `src/world/Hotspots.lua` defines the `Hotspots` class and manages hotspot hit detection.
+25. `Scene` handles left-stage mouse clicks and returns clicked hotspots to `PlayState`.
+26. `Scene` tracks the hovered hotspot and renders a translucent rectangle over it.
+27. `PlayState` prints a debug statement when a hotspot is clicked.
 
 ## Suggested Next Implementation
 

@@ -7,6 +7,7 @@ require 'src/StateMachine'
 require 'src/StateStack'
 
 require 'src/narrative/Story'
+require 'src/narrative/Script'
 HotspotData = require 'src/world/hotspot_data'
 require 'src/world/Hotspots'
 require 'src/world/Scene'
