@@ -44,7 +44,7 @@ end
 
 function PlayState:keypressed(key)
     if key == 'escape' then
-        gStateStack:push(PopupState())
+        gStateStack:push(ConsoleState())
     end
 end
 

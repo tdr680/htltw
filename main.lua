@@ -11,6 +11,8 @@ function love.load()
 
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
+    gDeveloper = false
+
     gStateStack = StateStack()
     gStateStack:push(PlayState())
 end

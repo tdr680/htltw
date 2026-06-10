@@ -1,6 +1,7 @@
 Class = require 'lib/class'
 push = require 'lib/push'
 lunajson = require 'lib/lunajson'
+Checkbox = require 'lib/checkbox'
 
 require 'src/constants'
 require 'src/StateMachine'
@@ -13,5 +14,5 @@ require 'src/world/Hotspots'
 require 'src/world/Scene'
 
 require 'src/states/BaseState'
-require 'src/states/PopupState'
+require 'src/states/ConsoleState'
 require 'src/states/PlayState'

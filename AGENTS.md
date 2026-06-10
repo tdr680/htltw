@@ -58,7 +58,7 @@ AGENTS.md            Architecture, decisions, and future direction.
 
 `PlayState` coordinates `Scene` and `Script`. `Script` owns story navigation and the active stitch; `PlayState` asks `Script` for the current stitch and tells `Scene` to render the matching visual stage. A larger scene controller should only be introduced once this logic grows beyond the first scene.
 
-`PopupState` is pushed on top of `PlayState` when Escape is pressed. While it is on top, `PlayState` remains visible underneath but receives no update or mouse input. Pressing Escape again pops the popup.
+`ConsoleState` is pushed on top of `PlayState` when Escape is pressed. It is currently a half-screen settings-style panel and can evolve into a settings window. While it is on top, `PlayState` remains visible underneath but receives no update or mouse input. Pressing Escape again pops the console.
 
 ## Screen Regions
 
@@ -105,6 +105,7 @@ Option interaction should use the option table's `linkPath` to choose the next s
 Use these libraries when implementing game systems:
 
 - `lib/class.lua` for all classes.
+- `lib/checkbox.lua` for reusable checkbox controls.
 - `lib/push.lua` for window scaling and presentation.
 - `lib/lunajson.lua` for JSON parsing.
 - `lib/knife` utilities when they simplify the implementation.
@@ -142,7 +143,8 @@ require 'lib/lunajson/sax'
 - `PlayState` should output the first stitch, `aTeacherYesThats`, in the right panel.
 - `Script` owns `Story`, right-panel text rendering, option click detection, and stitch navigation.
 - Right-panel options should be interactive with the mouse. On mouse press, clicking an option should change the right-panel text to that option's target stitch.
-- Use `StateStack` for modal overlays. Escape should push a half-width, half-height popup panel over `PlayState`; while the popup is active, underlying mouse interaction is paused.
+- Use `StateStack` for modal overlays. Escape should push `ConsoleState`, a half-width, half-height panel over `PlayState`; while the console is active, underlying mouse interaction is paused.
+- `ConsoleState` uses `lib/checkbox.lua` for a `Developer` checkbox. Its value is stored globally as `gDeveloper` for future systems, and clicking it prints the updated value for debugging.
 - Future architectural and technical decisions should be recorded in this file.
 
 ## Current Project State
@@ -156,7 +158,7 @@ The project has been brought to a minimal runnable Love2D scaffold:
 5. `src/StateStack.lua` controls the top-level state stack.
 6. `src/states/BaseState.lua` defines no-op state callbacks.
 7. `src/states/PlayState.lua` renders the first scene and delegates left-stage image rendering to `src/world/Scene.lua`.
-8. `src/states/PopupState.lua` renders a centered half-screen pause popup.
+8. `src/states/ConsoleState.lua` renders a centered half-screen console/settings panel.
 9. `main.lua` uses `push.lua` for drawing.
 10. `lib/lunajson.lua` is available for JSON parsing.
 11. `src/narrative/Story.lua` loads inklewriter JSON and exposes stitch text and options.
@@ -170,12 +172,14 @@ The project has been brought to a minimal runnable Love2D scaffold:
 19. `graphics/ch_01.png` was renamed to `graphics/aTeacherYesThats.png`.
 20. `graphics/ch_02.png` was renamed to `graphics/byFourOclockTheP.png`.
 21. `src/world/Scene.lua` renders `graphics/<stitchId>.png` when present and a blank left stage when missing.
-22. Pressing Escape in `PlayState` pushes `PopupState`; pressing Escape in `PopupState` pops it.
+22. Pressing Escape in `PlayState` pushes `ConsoleState`; pressing Escape in `ConsoleState` pops it.
 23. `src/world/hotspot_data.lua` stores example rectangular hotspots for `aTeacherYesThats` and `byFourOclockTheP`.
 24. `src/world/Hotspots.lua` defines the `Hotspots` class and manages hotspot hit detection.
 25. `Scene` handles left-stage mouse clicks and returns clicked hotspots to `PlayState`.
 26. `Scene` tracks the hovered hotspot and renders a translucent rectangle over it.
 27. `PlayState` prints a debug statement when a hotspot is clicked.
+28. `lib/checkbox.lua` defines a reusable `Checkbox` class.
+29. `ConsoleState` has a `Developer` checkbox that toggles the global `gDeveloper` flag and prints its updated value.
 
 ## Suggested Next Implementation
 
