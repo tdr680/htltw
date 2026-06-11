@@ -2,6 +2,7 @@ Class = require 'lib/class'
 push = require 'lib/push'
 lunajson = require 'lib/lunajson'
 Checkbox = require 'lib/checkbox'
+Button = require 'lib/button'
 
 require 'src/constants'
 require 'src/StateMachine'

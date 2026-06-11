@@ -6,6 +6,24 @@ function Script:init(path)
     self.text = ''
     self.options = {}
     self.optionBounds = {}
+    self.history = {}
+    self.changedByBackButton = false
+    self.backButton = Button {
+        x = WINDOW_WIDTH - PANEL_PADDING - SCRIPT_BACK_BUTTON_WIDTH,
+        y = TEXT_PANEL_HEIGHT - PANEL_PADDING - SCRIPT_BACK_BUTTON_HEIGHT,
+        width = SCRIPT_BACK_BUTTON_WIDTH,
+        height = SCRIPT_BACK_BUTTON_HEIGHT,
+        label = 'Back',
+        isVisible = function()
+            return gDeveloper
+        end,
+        isEnabled = function()
+            return self:canGoBack()
+        end,
+        onClick = function()
+            self.changedByBackButton = self:goBack()
+        end
+    }
 
     self:setStitch(self.story:getInitialStitchId())
 end
@@ -15,12 +33,20 @@ function Script:setStitch(stitchId)
         return false
     end
 
+    if self.currentStitchId and self.currentStitchId ~= stitchId then
+        table.insert(self.history, self.currentStitchId)
+    end
+
+    self:loadStitch(stitchId)
+
+    return true
+end
+
+function Script:loadStitch(stitchId)
     self.currentStitchId = stitchId
     self.text = self.story:getStitchText(stitchId)
     self.options = self.story:getOptions(stitchId)
     self.optionBounds = {}
-
-    return true
 end
 
 function Script:getCurrentStitchId()
@@ -45,11 +71,17 @@ function Script:render()
     )
 
     self:renderOptions()
+    self.backButton:render()
 end
 
 function Script:renderOptions()
     local optionHeight = 34
-    local optionsY = TEXT_PANEL_HEIGHT - PANEL_PADDING - (#self.options * optionHeight)
+    local developerOffset = 0
+    if gDeveloper then
+        developerOffset = SCRIPT_BACK_BUTTON_HEIGHT + 10
+    end
+
+    local optionsY = TEXT_PANEL_HEIGHT - PANEL_PADDING - developerOffset - (#self.options * optionHeight)
     self.optionBounds = {}
 
     love.graphics.setColor(0.64, 0.6, 0.5, 1)
@@ -80,6 +112,11 @@ function Script:mousepressed(x, y, button)
         return false
     end
 
+    self.changedByBackButton = false
+    if self.backButton:mousepressed(x, y, button) then
+        return self.changedByBackButton
+    end
+
     for index, bounds in ipairs(self.optionBounds) do
         local option = self.options[index]
 
@@ -93,6 +130,21 @@ end
 
 function Script:goToStitch(stitchId)
     return self:setStitch(stitchId)
+end
+
+function Script:canGoBack()
+    return #self.history > 0
+end
+
+function Script:goBack()
+    if not self:canGoBack() then
+        return false
+    end
+
+    local previousStitchId = table.remove(self.history)
+    self:loadStitch(previousStitchId)
+
+    return true
 end
 
 function Script:isInsideBounds(x, y, bounds)

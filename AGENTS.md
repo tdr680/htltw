@@ -105,6 +105,7 @@ Option interaction should use the option table's `linkPath` to choose the next s
 Use these libraries when implementing game systems:
 
 - `lib/class.lua` for all classes.
+- `lib/button.lua` for reusable button controls.
 - `lib/checkbox.lua` for reusable checkbox controls.
 - `lib/push.lua` for window scaling and presentation.
 - `lib/lunajson.lua` for JSON parsing.
@@ -142,6 +143,7 @@ require 'lib/lunajson/sax'
 - `narrative/part_01.json` contains part of the inklewriter story.
 - `PlayState` should output the first stitch, `aTeacherYesThats`, in the right panel.
 - `Script` owns `Story`, right-panel text rendering, option click detection, and stitch navigation.
+- When `gDeveloper` is true, `Script` shows a bottom-right `Back` button that returns to the previous stitch.
 - Right-panel options should be interactive with the mouse. On mouse press, clicking an option should change the right-panel text to that option's target stitch.
 - Use `StateStack` for modal overlays. Escape should push `ConsoleState`, a half-width, half-height panel over `PlayState`; while the console is active, underlying mouse interaction is paused.
 - `ConsoleState` uses `lib/checkbox.lua` for a `Developer` checkbox. Its value is stored globally as `gDeveloper` for future systems, and clicking it prints the updated value for debugging.
@@ -179,7 +181,9 @@ The project has been brought to a minimal runnable Love2D scaffold:
 26. `Scene` tracks the hovered hotspot and renders a translucent rectangle over it.
 27. `PlayState` prints a debug statement when a hotspot is clicked.
 28. `lib/checkbox.lua` defines a reusable `Checkbox` class.
-29. `ConsoleState` has a `Developer` checkbox that toggles the global `gDeveloper` flag and prints its updated value.
+29. `lib/button.lua` defines a reusable `Button` class.
+30. `ConsoleState` has a `Developer` checkbox that toggles the global `gDeveloper` flag and prints its updated value.
+31. When `gDeveloper` is true, `Script` shows a bottom-right `Back` button and uses stitch history to return to the previous stitch.
 
 ## Suggested Next Implementation
 
