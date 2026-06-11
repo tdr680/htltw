@@ -6,6 +6,12 @@ function Scene:init()
     self.currentStitchId = nil
     self.currentImage = nil
     self.hoveredHotspot = nil
+    self.hotspotLabelProvider = nil
+    self.hotspotLabel = Label()
+end
+
+function Scene:setHotspotLabelProvider(provider)
+    self.hotspotLabelProvider = provider
 end
 
 function Scene:setStitch(stitchId)
@@ -83,4 +89,27 @@ function Scene:renderHoveredHotspot()
         self.hoveredHotspot.width,
         self.hoveredHotspot.height
     )
+
+    self:renderHoveredHotspotLabel()
+end
+
+function Scene:renderHoveredHotspotLabel()
+    if not self.hotspotLabelProvider then
+        return
+    end
+
+    local label = self.hotspotLabelProvider(self.hoveredHotspot)
+
+    if not label or label == '' then
+        return
+    end
+
+    self.hotspotLabel:setText(label)
+    self.hotspotLabel:setBounds(
+        self.hoveredHotspot.x,
+        self.hoveredHotspot.y,
+        self.hoveredHotspot.width,
+        math.min(34, self.hoveredHotspot.height)
+    )
+    self.hotspotLabel:render()
 end

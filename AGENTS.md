@@ -107,6 +107,7 @@ Use these libraries when implementing game systems:
 - `lib/class.lua` for all classes.
 - `lib/button.lua` for reusable button controls.
 - `lib/checkbox.lua` for reusable checkbox controls.
+- `lib/label.lua` for reusable text labels with a background rectangle.
 - `lib/push.lua` for window scaling and presentation.
 - `lib/lunajson.lua` for JSON parsing.
 - `lib/knife` utilities when they simplify the implementation.
@@ -136,13 +137,15 @@ require 'lib/lunajson/sax'
 - `Hotspots` owns hotspot lookup; `Scene` asks it which hotspot was clicked; `PlayState` decides what the hotspot action means.
 - Hotspot targets may be placeholders during development. `PlayState` should only navigate to a hotspot target when `Story` confirms the stitch exists.
 - Hovered hotspots should be visualized on the left stage during development.
-- Clicking a hotspot should emit a debug statement with the hotspot id, action, and target.
+- Hovered hotspots with `action = 'stitch'` should also show the matching narrative option text for their target when that option exists.
+- Clicking a hotspot should emit a debug statement with the hotspot id, action, target, coordinates, and dimensions.
 - First scene: draw `graphics/aTeacherYesThats.png` on the left. The original right-panel placeholder was `HTLTW`.
 - Use `lib/class.lua` for all classes.
 - Use `push.lua` and `lib/knife` utilities for future functionality whenever they simplify the code.
 - `narrative/part_01.json` contains part of the inklewriter story.
 - `PlayState` should output the first stitch, `aTeacherYesThats`, in the right panel.
 - `Script` owns `Story`, right-panel text rendering, option click detection, and stitch navigation.
+- In normal mode, `Script` hides right-panel options whose `linkPath` is already reachable through a current-stitch hotspot with `action = 'stitch'`. When `gDeveloper` is true, those options remain visible.
 - When `gDeveloper` is true, `Script` shows a bottom-right `Back` button that returns to the previous stitch.
 - Right-panel options should be interactive with the mouse. On mouse press, clicking an option should change the right-panel text to that option's target stitch.
 - Use `StateStack` for modal overlays. Escape should push `ConsoleState`, a half-width, half-height panel over `PlayState`; while the console is active, underlying mouse interaction is paused.
@@ -179,11 +182,14 @@ The project has been brought to a minimal runnable Love2D scaffold:
 24. `src/world/Hotspots.lua` defines the `Hotspots` class and manages hotspot hit detection.
 25. `Scene` handles left-stage mouse clicks and returns clicked hotspots to `PlayState`.
 26. `Scene` tracks the hovered hotspot and renders a translucent rectangle over it.
-27. `PlayState` prints a debug statement when a hotspot is clicked.
+27. `PlayState` prints a debug statement with id, action, target, coordinates, and dimensions when a hotspot is clicked.
 28. `lib/checkbox.lua` defines a reusable `Checkbox` class.
 29. `lib/button.lua` defines a reusable `Button` class.
-30. `ConsoleState` has a `Developer` checkbox that toggles the global `gDeveloper` flag and prints its updated value.
-31. When `gDeveloper` is true, `Script` shows a bottom-right `Back` button and uses stitch history to return to the previous stitch.
+30. `lib/label.lua` defines a reusable `Label` class.
+31. `ConsoleState` has a `Developer` checkbox that toggles the global `gDeveloper` flag and prints its updated value.
+32. When `gDeveloper` is true, `Script` shows a bottom-right `Back` button and uses stitch history to return to the previous stitch.
+33. In normal mode, `Script` filters duplicate stitch options that are already represented by current-stitch hotspots; developer mode shows them.
+34. On hover, `Scene` asks `Script` for the option text matching a stitch hotspot target and renders it inside the hotspot area with `Label`.
 
 ## Suggested Next Implementation
 

@@ -18,7 +18,7 @@ return {
             width = 160,
             height = 260,
             action = 'stitch',
-            target = 'lookOutWindow'
+            target = 'veryGoodAfterEnd'
         }
     },
 

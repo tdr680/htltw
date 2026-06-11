@@ -1,7 +1,8 @@
 Script = Class{}
 
-function Script:init(path)
+function Script:init(path, hotspotData)
     self.story = Story(path)
+    self.hotspotData = hotspotData or {}
     self.currentStitchId = nil
     self.text = ''
     self.options = {}
@@ -76,16 +77,17 @@ end
 
 function Script:renderOptions()
     local optionHeight = 34
+    local options = self:getVisibleOptions()
     local developerOffset = 0
     if gDeveloper then
         developerOffset = SCRIPT_BACK_BUTTON_HEIGHT + 10
     end
 
-    local optionsY = TEXT_PANEL_HEIGHT - PANEL_PADDING - developerOffset - (#self.options * optionHeight)
+    local optionsY = TEXT_PANEL_HEIGHT - PANEL_PADDING - developerOffset - (#options * optionHeight)
     self.optionBounds = {}
 
     love.graphics.setColor(0.64, 0.6, 0.5, 1)
-    for index, option in ipairs(self.options) do
+    for index, option in ipairs(options) do
         local optionX = TEXT_PANEL_X + PANEL_PADDING
         local optionY = optionsY + (index - 1) * optionHeight
         local optionWidth = TEXT_PANEL_WIDTH - PANEL_PADDING * 2
@@ -117,8 +119,9 @@ function Script:mousepressed(x, y, button)
         return self.changedByBackButton
     end
 
+    local options = self:getVisibleOptions()
     for index, bounds in ipairs(self.optionBounds) do
-        local option = self.options[index]
+        local option = options[index]
 
         if option and self:isInsideBounds(x, y, bounds) then
             return self:setStitch(option.linkPath)
@@ -130,6 +133,46 @@ end
 
 function Script:goToStitch(stitchId)
     return self:setStitch(stitchId)
+end
+
+function Script:getVisibleOptions()
+    if gDeveloper then
+        return self.options
+    end
+
+    local hiddenTargets = self:getHotspotStitchTargets()
+    local options = {}
+
+    for _, option in ipairs(self.options) do
+        if not hiddenTargets[option.linkPath] then
+            table.insert(options, option)
+        end
+    end
+
+    return options
+end
+
+function Script:getHotspotStitchTargets()
+    local targets = {}
+    local hotspots = self.hotspotData[self.currentStitchId] or {}
+
+    for _, hotspot in ipairs(hotspots) do
+        if hotspot.action == 'stitch' and hotspot.target then
+            targets[hotspot.target] = true
+        end
+    end
+
+    return targets
+end
+
+function Script:getOptionTextForTarget(target)
+    for _, option in ipairs(self.options) do
+        if option.linkPath == target then
+            return option.text
+        end
+    end
+
+    return nil
 end
 
 function Script:canGoBack()

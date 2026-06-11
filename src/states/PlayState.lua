@@ -2,7 +2,14 @@ PlayState = Class{__includes = BaseState}
 
 function PlayState:init()
     self.scene = Scene()
-    self.script = Script('narrative/part_01.json')
+    self.script = Script('narrative/part_01.json', HotspotData)
+    self.scene:setHotspotLabelProvider(function(hotspot)
+        if hotspot.action == 'stitch' then
+            return self.script:getOptionTextForTarget(hotspot.target)
+        end
+
+        return nil
+    end)
 
     self:syncScene()
 end
@@ -22,7 +29,14 @@ function PlayState:mousepressed(x, y, button)
     local hotspot = self.scene:mousepressed(x, y, button)
 
     if hotspot then
-        print('Hotspot clicked: ' .. hotspot.id .. ' -> ' .. hotspot.action .. ':' .. tostring(hotspot.target))
+        print(
+            'Hotspot clicked: ' .. hotspot.id
+            .. ' -> ' .. hotspot.action .. ':' .. tostring(hotspot.target)
+            .. ' at x=' .. tostring(hotspot.x)
+            .. ', y=' .. tostring(hotspot.y)
+            .. ', width=' .. tostring(hotspot.width)
+            .. ', height=' .. tostring(hotspot.height)
+        )
         self:handleHotspot(hotspot)
         return
     end

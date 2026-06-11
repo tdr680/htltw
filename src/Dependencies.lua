@@ -3,6 +3,7 @@ push = require 'lib/push'
 lunajson = require 'lib/lunajson'
 Checkbox = require 'lib/checkbox'
 Button = require 'lib/button'
+Label = require 'lib/label'
 
 require 'src/constants'
 require 'src/StateMachine'
