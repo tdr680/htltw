@@ -1,14 +1,14 @@
 return {
     aTeacherYesThats = {
         {
-            id = 'desk',
+            id = 'leavingSchool',
             shape = 'rect',
             x = 120,
             y = 360,
             width = 220,
             height = 140,
-            action = 'stitch',
-            target = 'inspectDesk'
+            action = 'game',
+            target = 'Greeting'
         },
         {
             id = 'window',

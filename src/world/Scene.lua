@@ -71,7 +71,9 @@ function Scene:renderHoveredHotspot()
         return
     end
 
-    love.graphics.setColor(0.92, 0.78, 0.3, 0.22)
+    local fillColor, lineColor = self:getHotspotColors(self.hoveredHotspot)
+
+    love.graphics.setColor(fillColor)
     love.graphics.rectangle(
         'fill',
         self.hoveredHotspot.x,
@@ -80,7 +82,7 @@ function Scene:renderHoveredHotspot()
         self.hoveredHotspot.height
     )
 
-    love.graphics.setColor(0.92, 0.78, 0.3, 0.85)
+    love.graphics.setColor(lineColor)
     love.graphics.setLineWidth(2)
     love.graphics.rectangle(
         'line',
@@ -91,6 +93,14 @@ function Scene:renderHoveredHotspot()
     )
 
     self:renderHoveredHotspotLabel()
+end
+
+function Scene:getHotspotColors(hotspot)
+    if hotspot.action == 'game' then
+        return {0.28, 0.72, 0.95, 0.22}, {0.28, 0.72, 0.95, 0.85}
+    end
+
+    return {0.92, 0.78, 0.3, 0.22}, {0.92, 0.78, 0.3, 0.85}
 end
 
 function Scene:renderHoveredHotspotLabel()

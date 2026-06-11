@@ -16,5 +16,8 @@ require 'src/world/Hotspots'
 require 'src/world/Scene'
 
 require 'src/states/BaseState'
+require 'src/states/GameState'
 require 'src/states/ConsoleState'
 require 'src/states/PlayState'
+
+require 'src/games/Greeting'

@@ -19,6 +19,7 @@ Code structure and implementation patterns should take inspiration from these CS
 - Third-party utilities live in `lib/`.
 - Game source code lives in `src/`.
 - State classes live in `src/states/`.
+- Mini-game classes live in `src/games/`.
 - Narrative loading code lives in `src/narrative/`.
 - Scene and world presentation code lives in `src/world/`.
 
@@ -31,6 +32,7 @@ sounds/              Delivered audio assets.
 lib/                 Third-party helpers: class, push, lunajson, and knife utilities.
 src/                 Game source files.
 src/states/          State machine states.
+src/games/           Mini-game states derived from GameState.
 src/narrative/       Story loading and inklewriter JSON helpers.
 src/world/           Scene, hotspot, character, and object code.
 AGENTS.md            Architecture, decisions, and future direction.
@@ -59,6 +61,8 @@ AGENTS.md            Architecture, decisions, and future direction.
 `PlayState` coordinates `Scene` and `Script`. `Script` owns story navigation and the active stitch; `PlayState` asks `Script` for the current stitch and tells `Scene` to render the matching visual stage. A larger scene controller should only be introduced once this logic grows beyond the first scene.
 
 `ConsoleState` is pushed on top of `PlayState` when Escape is pressed. It is currently a half-screen settings-style panel and can evolve into a settings window. While it is on top, `PlayState` remains visible underneath but receives no update or mouse input. Pressing Escape again pops the console.
+
+`src/states/GameState.lua` is the base class for mini-games. It renders a centered popup window similar to `ConsoleState` and pops on Escape. Mini-games in `src/games/` should derive from it.
 
 ## Screen Regions
 
@@ -138,6 +142,7 @@ require 'lib/lunajson/sax'
 - Hotspot targets may be placeholders during development. `PlayState` should only navigate to a hotspot target when `Story` confirms the stitch exists.
 - Hovered hotspots should be visualized on the left stage during development.
 - Hovered hotspots with `action = 'stitch'` should also show the matching narrative option text for their target when that option exists.
+- Hovered hotspots with `action = 'game'` should show their target game class name and use a different highlight color than stitch hotspots.
 - Clicking a hotspot should emit a debug statement with the hotspot id, action, target, coordinates, and dimensions.
 - First scene: draw `graphics/aTeacherYesThats.png` on the left. The original right-panel placeholder was `HTLTW`.
 - Use `lib/class.lua` for all classes.
@@ -149,6 +154,8 @@ require 'lib/lunajson/sax'
 - When `gDeveloper` is true, `Script` shows a bottom-right `Back` button that returns to the previous stitch.
 - Right-panel options should be interactive with the mouse. On mouse press, clicking an option should change the right-panel text to that option's target stitch.
 - Use `StateStack` for modal overlays. Escape should push `ConsoleState`, a half-width, half-height panel over `PlayState`; while the console is active, underlying mouse interaction is paused.
+- Hotspots may use `action = 'game'` and `target = '<GameClassName>'`. `PlayState` resolves that target as a global game class and pushes it on the state stack.
+- The first `game` hotspot is `leavingSchool`, targeting `Greeting`.
 - `ConsoleState` uses `lib/checkbox.lua` for a `Developer` checkbox. Its value is stored globally as `gDeveloper` for future systems, and clicking it prints the updated value for debugging.
 - Future architectural and technical decisions should be recorded in this file.
 
@@ -190,6 +197,10 @@ The project has been brought to a minimal runnable Love2D scaffold:
 32. When `gDeveloper` is true, `Script` shows a bottom-right `Back` button and uses stitch history to return to the previous stitch.
 33. In normal mode, `Script` filters duplicate stitch options that are already represented by current-stitch hotspots; developer mode shows them.
 34. On hover, `Scene` asks `Script` for the option text matching a stitch hotspot target and renders it inside the hotspot area with `Label`.
+35. On hover, game hotspots show their target class name and use a different highlight color than stitch hotspots.
+36. `src/states/GameState.lua` defines the base popup state for mini-games.
+37. `src/games/Greeting.lua` defines the first empty mini-game derived from `GameState`.
+38. `leavingSchool` is the first hotspot with `action = 'game'` and `target = 'Greeting'`.
 
 ## Suggested Next Implementation
 

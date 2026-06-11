@@ -6,6 +6,8 @@ function PlayState:init()
     self.scene:setHotspotLabelProvider(function(hotspot)
         if hotspot.action == 'stitch' then
             return self.script:getOptionTextForTarget(hotspot.target)
+        elseif hotspot.action == 'game' then
+            return hotspot.target
         end
 
         return nil
@@ -53,7 +55,20 @@ end
 function PlayState:handleHotspot(hotspot)
     if hotspot.action == 'stitch' and self.script:goToStitch(hotspot.target) then
         self:syncScene()
+    elseif hotspot.action == 'game' then
+        self:pushGame(hotspot.target)
     end
+end
+
+function PlayState:pushGame(gameName)
+    local gameClass = _G[gameName]
+
+    if not gameClass then
+        print('Game not found: ' .. tostring(gameName))
+        return
+    end
+
+    gStateStack:push(gameClass())
 end
 
 function PlayState:keypressed(key)
